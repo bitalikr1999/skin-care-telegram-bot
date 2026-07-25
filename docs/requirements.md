@@ -155,19 +155,15 @@ pnpm seed          # MOD=cli seed
 pnpm start:bot     # MOD=bot (requires BOT_TOKEN)
 ```
 
-### Heroku
-Файли: `Procfile`, `app.json`, `pnpm build` → `dist/`.
-Процес: `worker` (long polling, без web).
-Release: `seed` перед стартом.
+### Docker / VPS
+Файли: `Dockerfile`, `docker-compose.yml`, volume `skin_diary_data` для SQLite.
 
 ```
-heroku create
-heroku config:set BOT_TOKEN=... SQLITE_PATH=/app/data/skin-diary.sqlite
-git push heroku main
-heroku ps:scale worker=1 web=0
+cp .env.example .env   # задати BOT_TOKEN
+docker compose up -d --build
 ```
 
-SQLite на Heroku ephemeral (дані зникають після restart dyno), якщо потрібна персистентність — Persistent Disk або інша БД.
+Seed запускається в entrypoint перед стартом бота. Дані в named volume — зберігаються між редеплоями.
 
 ## 11. Шари Telegram
 
