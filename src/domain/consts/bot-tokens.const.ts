@@ -1,0 +1,1 @@
+export const BOT_UPDATE_HANDLER = Symbol('BOT_UPDATE_HANDLER');

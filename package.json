@@ -1,0 +1,38 @@
+{
+  "name": "skin-diary",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:bot": "MOD=bot tsx --env-file=.env src/main.ts",
+    "cli": "MOD=cli tsx --env-file=.env src/main.ts",
+    "seed": "MOD=cli tsx --env-file=.env src/main.ts seed",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.2.2",
+      "onFail": "download"
+    }
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.28",
+    "@nestjs/core": "^11.1.28",
+    "better-sqlite3": "^13.0.1",
+    "knex": "^3.3.0",
+    "nest-commander": "^3.20.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "telegraf": "^4.16.3"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^26.1.1",
+    "tsx": "^4.23.1",
+    "typescript": "^5.7.3"
+  }
+}

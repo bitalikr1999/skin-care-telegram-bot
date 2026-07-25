@@ -1,0 +1,2 @@
+export const TELEGRAF_BOT = Symbol('TELEGRAF_BOT');
+export const TELEGRAF_MODULE_CONFIG = Symbol('TELEGRAF_MODULE_CONFIG');
