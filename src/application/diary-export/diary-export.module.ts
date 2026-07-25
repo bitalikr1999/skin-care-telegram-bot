@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { DbLightModule } from '@infra/db-light/db-light.module';
-import { provide_class } from '@shared/utils';
+import { ProviderUtils } from '@shared/utils';
 
 import { DIARY_EXPORT_SERVICE } from './ports/diary-export.port';
 import { DiaryExportService } from './v1/services/diary-export.service';
@@ -9,7 +9,7 @@ import { DiaryExportService } from './v1/services/diary-export.service';
 @Module({
   imports: [DbLightModule],
   providers: [
-    provide_class(DIARY_EXPORT_SERVICE, DiaryExportService),
+    ProviderUtils.provide_class(DIARY_EXPORT_SERVICE, DiaryExportService),
   ],
   exports: [DIARY_EXPORT_SERVICE],
 })

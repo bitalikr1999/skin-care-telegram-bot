@@ -1,11 +1,11 @@
 import { RatingMapper } from '@domain/entities/rating/rating.mapper';
 import { Rating } from '@domain/entities/rating/rating.entity';
-import { is_valid_rating } from '@domain/utils/rating.util';
+import { RatingUtils } from '@domain/utils/rating.util';
 import { IDbRating } from '../interfaces';
 
 export class DbRatingMapper {
   public static to_entity(row: IDbRating): Rating {
-    if (!is_valid_rating(row.rating)) {
+    if (!RatingUtils.is_valid(row.rating)) {
       throw new Error(`Invalid rating in db: ${row.rating}`);
     }
 

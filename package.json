@@ -2,20 +2,29 @@
   "name": "skin-diary",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/main.js",
   "scripts": {
+    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "start": "MOD=bot node dist/main.js",
     "start:bot": "MOD=bot tsx --env-file=.env src/main.ts",
     "cli": "MOD=cli tsx --env-file=.env src/main.ts",
     "seed": "MOD=cli tsx --env-file=.env src/main.ts seed",
-    "typecheck": "tsc --noEmit"
+    "seed:prod": "MOD=cli node dist/main.js seed",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": "22.x",
+    "pnpm": "11.x"
+  },
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
-      "version": "^11.2.2",
+      "version": "11.17.0",
       "onFail": "download"
     }
   },
@@ -32,7 +41,10 @@
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^26.1.1",
+    "tsc-alias": "^1.9.1",
     "tsx": "^4.23.1",
-    "typescript": "^5.7.3"
-  }
+    "typescript": "^5.7.3",
+    "vitest": "^4.1.10"
+  },
+  "packageManager": "pnpm@11.17.0"
 }

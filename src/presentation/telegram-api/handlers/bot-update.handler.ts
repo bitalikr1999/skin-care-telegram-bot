@@ -21,6 +21,10 @@ import {
   IDiaryStatisticsService,
 } from '@application/diary-statistics/ports/diary-statistics.port';
 import {
+  DIARY_SYMPTOM_STATS_SERVICE,
+  IDiarySymptomStatsService,
+} from '@application/diary-symptom-stats/ports/diary-symptom-stats.port';
+import {
   DIARY_SYMPTOMS_SERVICE,
   IDiarySymptomsService,
 } from '@application/diary-symptoms/ports/diary-symptoms.port';
@@ -28,6 +32,7 @@ import {
   ACTIVITIES_REPOSITORY,
   SYMPTOMS_REPOSITORY,
 } from '@domain/consts/repository-tokens.const';
+import { StatsPeriod } from '@domain/consts/stats-period.const';
 import {
   IBotIncomingCallback,
   IBotIncomingCommand,
@@ -38,18 +43,20 @@ import {
   IActivitiesRepository,
   ISymptomsRepository,
 } from '@domain/repositories';
-import { today_date } from '@domain/utils/date.util';
-import { is_valid_rating } from '@domain/utils/rating.util';
+import { DateUtils } from '@domain/utils/date.util';
+import { RatingUtils } from '@domain/utils/rating.util';
 
 import {
   BackKeyboard,
   CatalogKeyboard,
   MenuKeyboard,
   RatingKeyboard,
+  SymptomStatsPeriodKeyboard,
 } from '../keyboards/bot.keyboards';
 import {
   DayRecordTextMapper,
   StatisticsTextMapper,
+  SymptomStatsTextMapper,
 } from '../mappers/view-text.mapper';
 import { CallbackRouter } from '../routers/callback.router';
 
@@ -66,6 +73,8 @@ export class BotUpdateHandler implements IBotUpdateHandler {
     private readonly day_service: IDiaryDayService,
     @Inject(DIARY_STATISTICS_SERVICE)
     private readonly statistics_service: IDiaryStatisticsService,
+    @Inject(DIARY_SYMPTOM_STATS_SERVICE)
+    private readonly symptom_stats_service: IDiarySymptomStatsService,
     @Inject(DIARY_EXPORT_SERVICE)
     private readonly export_service: IDiaryExportService,
     @Inject(ACTIVITIES_REPOSITORY)
@@ -91,7 +100,7 @@ export class BotUpdateHandler implements IBotUpdateHandler {
     params: IBotIncomingCallback,
   ): Promise<IBotView> {
     const action = CallbackRouter.parse(params.data);
-    const date = today_date();
+    const date = DateUtils.today();
 
     switch (action.kind) {
       case 'nav_menu':
@@ -168,7 +177,7 @@ export class BotUpdateHandler implements IBotUpdateHandler {
           message_id: params.message_id,
         });
       case 'rat_set':
-        if (!is_valid_rating(action.rating)) {
+        if (!RatingUtils.is_valid(action.rating)) {
           return this._menu_view(params.message_id);
         }
         await this.rating_service.upsert({
@@ -187,9 +196,17 @@ export class BotUpdateHandler implements IBotUpdateHandler {
           date,
           message_id: params.message_id,
         });
-      case 'nav_stats':
-        return this._stats_view({
+      case 'nav_stats_rating':
+        return this._rating_stats_view({
           chat_id: params.chat_id,
+          message_id: params.message_id,
+        });
+      case 'nav_stats_symptoms':
+        return this._symptom_stats_period_view(params.message_id);
+      case 'stats_period':
+        return this._symptom_stats_view({
+          chat_id: params.chat_id,
+          period: action.period,
           message_id: params.message_id,
         });
       case 'nav_export':
@@ -299,7 +316,7 @@ export class BotUpdateHandler implements IBotUpdateHandler {
     };
   }
 
-  private async _stats_view(params: {
+  private async _rating_stats_view(params: {
     chat_id: number;
     message_id: number;
   }): Promise<IBotView> {
@@ -311,6 +328,42 @@ export class BotUpdateHandler implements IBotUpdateHandler {
     return {
       text: StatisticsTextMapper.to_text({ stats, activities }),
       buttons: BackKeyboard.build(),
+      edit_message_id: params.message_id,
+    };
+  }
+
+  private _symptom_stats_period_view(
+    message_id: number,
+  ): IBotView {
+    return {
+      text: '🔍 Симптоми разом — обери період',
+      buttons: SymptomStatsPeriodKeyboard.build(),
+      edit_message_id: message_id,
+    };
+  }
+
+  private async _symptom_stats_view(params: {
+    chat_id: number;
+    period: StatsPeriod;
+    message_id: number;
+  }): Promise<IBotView> {
+    const [stats, activities, symptoms] = await Promise.all([
+      this.symptom_stats_service.get({
+        chat_id: params.chat_id,
+        period: params.period,
+      }),
+      this.activities_repository.list_all(),
+      this.symptoms_repository.list_all(),
+    ]);
+
+    return {
+      text: SymptomStatsTextMapper.to_text({
+        period: params.period,
+        stats,
+        activities,
+        symptoms,
+      }),
+      buttons: SymptomStatsPeriodKeyboard.build(),
       edit_message_id: params.message_id,
     };
   }

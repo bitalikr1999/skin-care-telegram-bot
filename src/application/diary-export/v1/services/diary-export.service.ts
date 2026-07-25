@@ -110,8 +110,8 @@ export class DiaryExportService implements IDiaryExportService {
         [
           date,
           rating === undefined ? '' : String(rating),
-          csv_escape(day_activities),
-          csv_escape(day_symptoms),
+          DiaryExportService._csv_escape(day_activities),
+          DiaryExportService._csv_escape(day_symptoms),
         ].join(','),
       );
     }
@@ -121,15 +121,15 @@ export class DiaryExportService implements IDiaryExportService {
       content: `${lines.join('\n')}\n`,
     };
   }
-}
 
-function csv_escape(value: string): string {
-  if (
-    value.includes(',') ||
-    value.includes('"') ||
-    value.includes('\n')
-  ) {
-    return `"${value.replace(/"/g, '""')}"`;
+  private static _csv_escape(value: string): string {
+    if (
+      value.includes(',') ||
+      value.includes('"') ||
+      value.includes('\n')
+    ) {
+      return `"${value.replace(/"/g, '""')}"`;
+    }
+    return value;
   }
-  return value;
 }

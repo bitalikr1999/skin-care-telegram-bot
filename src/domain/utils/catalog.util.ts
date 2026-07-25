@@ -6,19 +6,23 @@ export interface IToggleItemParams {
   item_key: string;
 }
 
-export function is_valid_activity_key(key: string): boolean {
-  return ACTIVITY_KEYS.includes(key);
-}
-
-export function is_valid_symptom_key(key: string): boolean {
-  return SYMPTOM_KEYS.includes(key);
-}
-
-export function toggle_item(params: IToggleItemParams): string[] {
-  if (params.selected.includes(params.item_key)) {
-    return params.selected.filter(
-      (key) => key !== params.item_key,
-    );
+export class CatalogUtils {
+  public static is_valid_activity_key(key: string): boolean {
+    return ACTIVITY_KEYS.includes(key);
   }
-  return [...params.selected, params.item_key];
+
+  public static is_valid_symptom_key(key: string): boolean {
+    return SYMPTOM_KEYS.includes(key);
+  }
+
+  public static toggle_item(
+    params: IToggleItemParams,
+  ): string[] {
+    if (params.selected.includes(params.item_key)) {
+      return params.selected.filter(
+        (key) => key !== params.item_key,
+      );
+    }
+    return [...params.selected, params.item_key];
+  }
 }

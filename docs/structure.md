@@ -58,7 +58,7 @@ application/<feature>/
 
 - Define ports as `interface` + `Symbol` token
 - Inject ports in presentation; bind implementations in modules
-- Diary features: `diary-activities`, `diary-symptoms`, `diary-rating`, `diary-day`, `diary-statistics`, `diary-export`
+- Diary features: `diary-activities`, `diary-symptoms`, `diary-rating`, `diary-day`, `diary-statistics`, `diary-symptom-stats`, `diary-export`
 - Bot channel contracts: `domain/interfaces/bot-ui.interface.ts` + `domain/consts/bot-tokens.const.ts` — implemented by `presentation/telegram-api`, consumed by `infra/telegraf`
 
 ### `infra/`

@@ -6,9 +6,10 @@ import { DiaryDayModule } from '@application/diary-day/diary-day.module';
 import { DiaryExportModule } from '@application/diary-export/diary-export.module';
 import { DiaryRatingModule } from '@application/diary-rating/diary-rating.module';
 import { DiaryStatisticsModule } from '@application/diary-statistics/diary-statistics.module';
+import { DiarySymptomStatsModule } from '@application/diary-symptom-stats/diary-symptom-stats.module';
 import { DiarySymptomsModule } from '@application/diary-symptoms/diary-symptoms.module';
 import { DbLightModule } from '@infra/db-light/db-light.module';
-import { provide_class } from '@shared/utils';
+import { ProviderUtils } from '@shared/utils';
 
 import { BotUpdateHandler } from './handlers/bot-update.handler';
 
@@ -20,10 +21,11 @@ import { BotUpdateHandler } from './handlers/bot-update.handler';
     DiaryRatingModule,
     DiaryDayModule,
     DiaryStatisticsModule,
+    DiarySymptomStatsModule,
     DiaryExportModule,
   ],
   providers: [
-    provide_class(BOT_UPDATE_HANDLER, BotUpdateHandler),
+    ProviderUtils.provide_class(BOT_UPDATE_HANDLER, BotUpdateHandler),
   ],
   exports: [BOT_UPDATE_HANDLER],
 })

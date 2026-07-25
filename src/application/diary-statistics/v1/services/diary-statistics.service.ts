@@ -9,7 +9,7 @@ import {
   IActivityRecordsRepository,
   IRatingsRepository,
 } from '@domain/repositories';
-import { calculate_activity_correlations } from '@domain/utils/statistics.util';
+import { StatisticsUtils } from '@domain/utils/statistics.util';
 
 import {
   IDiaryStatisticsService,
@@ -48,6 +48,8 @@ export class DiaryStatisticsService
       activity_keys: activities_by_date.get(rating.date) ?? [],
     }));
 
-    return calculate_activity_correlations(rated_days);
+    return StatisticsUtils.calculate_activity_correlations(
+      rated_days,
+    );
   }
 }

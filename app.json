@@ -1,0 +1,32 @@
+{
+  "name": "skin-diary",
+  "description": "SkinLog Telegram diary bot",
+  "repository": "",
+  "env": {
+    "BOT_TOKEN": {
+      "description": "Telegram bot token from @BotFather",
+      "required": true
+    },
+    "SQLITE_PATH": {
+      "description": "SQLite file path (ephemeral on Heroku unless you add persistent disk)",
+      "value": "/app/data/skin-diary.sqlite",
+      "required": false
+    }
+  },
+  "formation": {
+    "worker": {
+      "quantity": 1,
+      "size": "basic"
+    },
+    "web": {
+      "quantity": 0,
+      "size": "basic"
+    }
+  },
+  "addons": [],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ]
+}

@@ -7,7 +7,7 @@ import {
   SYMPTOM_RECORDS_REPOSITORY,
   SYMPTOMS_REPOSITORY,
 } from '@domain/consts/repository-tokens.const';
-import { provide_class } from '@shared/utils';
+import { ProviderUtils } from '@shared/utils';
 
 import { DbActionFactory } from './factories';
 import {
@@ -29,14 +29,14 @@ import {
     ModuleConfigProvider.provide(),
     ConnectionsPoolProvider.provide(),
     DbActionFactory,
-    provide_class(ACTIVITIES_REPOSITORY, ActivitiesRepository),
-    provide_class(SYMPTOMS_REPOSITORY, SymptomsRepository),
-    provide_class(RATINGS_REPOSITORY, RatingsRepository),
-    provide_class(
+    ProviderUtils.provide_class(ACTIVITIES_REPOSITORY, ActivitiesRepository),
+    ProviderUtils.provide_class(SYMPTOMS_REPOSITORY, SymptomsRepository),
+    ProviderUtils.provide_class(RATINGS_REPOSITORY, RatingsRepository),
+    ProviderUtils.provide_class(
       ACTIVITY_RECORDS_REPOSITORY,
       ActivityRecordsRepository,
     ),
-    provide_class(
+    ProviderUtils.provide_class(
       SYMPTOM_RECORDS_REPOSITORY,
       SymptomRecordsRepository,
     ),

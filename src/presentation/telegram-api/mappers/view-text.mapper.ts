@@ -1,7 +1,16 @@
 import { DayRecord } from '@domain/aggregations/day-record/day-record.aggregation';
+import { StatsPeriod } from '@domain/consts/stats-period.const';
 import { Activity } from '@domain/entities/activity/activity.entity';
 import { Symptom } from '@domain/entities/symptom/symptom.entity';
 import { IStatisticsResult } from '@domain/interfaces/statistics.interface';
+import { ISymptomCooccurrence } from '@domain/interfaces/symptom-stats.interface';
+
+const PERIOD_LABEL: Record<StatsPeriod, string> = {
+  week: 'тиждень',
+  month: 'місяць',
+  quarter: '3 місяці',
+  all: 'весь час',
+};
 
 export class DayRecordTextMapper {
   public static to_text(params: {
@@ -39,7 +48,11 @@ export class StatisticsTextMapper {
     activities: Activity[];
   }): string {
     if (!params.stats) {
-      return '📈 Замало даних для статистики (потрібно щонайменше 3 дні з оцінкою).';
+      return [
+        '📈 Оцінка і активності',
+        '',
+        'Замало даних (потрібно щонайменше 3 дні з оцінкою).',
+      ].join('\n');
     }
 
     const labels = new Map(
@@ -65,7 +78,7 @@ export class StatisticsTextMapper {
       .join('\n');
 
     return [
-      '📈 Статистика (кореляція, не причинність)',
+      '📈 Оцінка і активності (кореляція, не причинність)',
       '',
       'Топ негативних:',
       negative || '—',
@@ -75,5 +88,78 @@ export class StatisticsTextMapper {
       '',
       '⚠️ Це кореляція, не причинно-наслідковий доказ.',
     ].join('\n');
+  }
+}
+
+export class SymptomStatsTextMapper {
+  public static to_text(params: {
+    period: StatsPeriod;
+    stats: ISymptomCooccurrence[] | null;
+    activities: Activity[];
+    symptoms: Symptom[];
+  }): string {
+    const period_label = PERIOD_LABEL[params.period];
+
+    if (!params.stats) {
+      return [
+        `🔍 Симптоми разом (${period_label})`,
+        '',
+        'Замало даних (потрібно щонайменше 3 дні з симптомами).',
+      ].join('\n');
+    }
+
+    const activity_labels = new Map(
+      params.activities.map((item) => [item.key, item.label]),
+    );
+    const symptom_labels = new Map(
+      params.symptoms.map((item) => [item.key, item.label]),
+    );
+
+    const blocks = params.stats.map((item) => {
+      const symptom_label =
+        symptom_labels.get(item.symptom_key) ?? item.symptom_key;
+      const activities = SymptomStatsTextMapper._format_related({
+        items: item.activities,
+        labels: activity_labels,
+      });
+      const symptoms = SymptomStatsTextMapper._format_related({
+        items: item.symptoms,
+        labels: symptom_labels,
+      });
+
+      return [
+        `${symptom_label} — ${item.days} дн.`,
+        'Часто разом:',
+        activities,
+        'Інші симптоми:',
+        symptoms,
+      ].join('\n');
+    });
+
+    return [
+      `🔍 Симптоми разом (${period_label})`,
+      '',
+      ...blocks.flatMap((block, index) =>
+        index === 0 ? [block] : ['', block],
+      ),
+      '',
+      '⚠️ Співпадіння в ті самі дні, не причинність.',
+    ].join('\n');
+  }
+
+  private static _format_related(params: {
+    items: Array<{ key: string; days: number; percent: number }>;
+    labels: Map<string, string>;
+  }): string {
+    if (params.items.length === 0) {
+      return '—';
+    }
+
+    return params.items
+      .map((item) => {
+        const label = params.labels.get(item.key) ?? item.key;
+        return `• ${label} — ${item.days} (${item.percent}%)`;
+      })
+      .join('\n');
   }
 }

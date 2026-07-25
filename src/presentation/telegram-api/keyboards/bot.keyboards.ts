@@ -1,13 +1,11 @@
 import { RatingValue, RATING_VALUES } from '@domain/consts/rating.const';
-import { IBotButton } from '@domain/interfaces/bot-ui.interface';
 import { Activity } from '@domain/entities/activity/activity.entity';
 import { Symptom } from '@domain/entities/symptom/symptom.entity';
+import { IBotButton } from '@domain/interfaces/bot-ui.interface';
 
 import {
-  act_toggle,
   CALLBACK,
-  rat_set,
-  sym_toggle,
+  CallbackData,
 } from '../consts/callback.const';
 
 export class MenuKeyboard {
@@ -39,8 +37,14 @@ export class MenuKeyboard {
       ],
       [
         {
-          text: '📈 Статистика',
-          callback_data: CALLBACK.NAV_STATS,
+          text: '📈 Оцінка і активності',
+          callback_data: CALLBACK.NAV_STATS_RATING,
+        },
+      ],
+      [
+        {
+          text: '🔍 Симптоми разом',
+          callback_data: CALLBACK.NAV_STATS_SYMPTOMS,
         },
       ],
     ];
@@ -55,7 +59,7 @@ export class CatalogKeyboard {
     return CatalogKeyboard._build_catalog({
       items: params.activities,
       selected_keys: params.selected_keys,
-      toggle: act_toggle,
+      toggle: CallbackData.act_toggle,
       done_callback: CALLBACK.DONE_ACTIVITIES,
     });
   }
@@ -67,7 +71,7 @@ export class CatalogKeyboard {
     return CatalogKeyboard._build_catalog({
       items: params.symptoms,
       selected_keys: params.selected_keys,
-      toggle: sym_toggle,
+      toggle: CallbackData.sym_toggle,
       done_callback: CALLBACK.DONE_SYMPTOMS,
     });
   }
@@ -120,13 +124,41 @@ export class RatingKeyboard {
     const row = RATING_VALUES.map((value) => ({
       text:
         current_rating === value ? `[${value}]` : String(value),
-      callback_data: rat_set(value),
+      callback_data: CallbackData.rat_set(value),
     }));
 
     return [
       row.slice(0, 5),
       row.slice(5),
       [{ text: 'Готово', callback_data: CALLBACK.DONE_RATING }],
+    ];
+  }
+}
+
+export class SymptomStatsPeriodKeyboard {
+  public static build(): IBotButton[][] {
+    return [
+      [
+        {
+          text: 'Тиждень',
+          callback_data: CallbackData.stats_period('week'),
+        },
+        {
+          text: 'Місяць',
+          callback_data: CallbackData.stats_period('month'),
+        },
+      ],
+      [
+        {
+          text: '3 місяці',
+          callback_data: CallbackData.stats_period('quarter'),
+        },
+        {
+          text: 'Загальна',
+          callback_data: CallbackData.stats_period('all'),
+        },
+      ],
+      [{ text: '⬅️ Назад', callback_data: CALLBACK.NAV_MENU }],
     ];
   }
 }

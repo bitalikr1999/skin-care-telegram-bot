@@ -7,8 +7,8 @@ export const STATS_PERIODS: StatsPeriod[] = [
   'all',
 ];
 
-export function is_stats_period(
-  value: string,
-): value is StatsPeriod {
-  return (STATS_PERIODS as string[]).includes(value);
+export class StatsPeriodUtils {
+  public static is(value: string): value is StatsPeriod {
+    return (STATS_PERIODS as string[]).includes(value);
+  }
 }
