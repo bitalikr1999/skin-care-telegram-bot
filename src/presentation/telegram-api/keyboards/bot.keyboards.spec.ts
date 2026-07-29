@@ -22,40 +22,60 @@ describe('MenuKeyboard', () => {
 });
 
 describe('CatalogKeyboard', () => {
-  describe('build_activities', () => {
-    it('should mark selected items and add category rows', () => {
-      const activities = [
-        new Activity({
-          key: 'honey',
-          label: 'мед',
-          category_key: 'food',
-          category_label: 'Їжа',
-        }),
-        new Activity({
-          key: 'stress',
-          label: 'стрес',
-          category_key: 'env',
-          category_label: 'Довкілля',
-        }),
-      ];
+  const activities = [
+    new Activity({
+      key: 'honey',
+      label: 'мед',
+      category_key: 'food',
+      category_label: 'Їжа',
+    }),
+    new Activity({
+      key: 'stress',
+      label: 'стрес',
+      category_key: 'env',
+      category_label: 'Довкілля',
+    }),
+  ];
 
-      const rows = CatalogKeyboard.build_activities({
+  describe('build_activity_categories', () => {
+    it('should list unique categories', () => {
+      const rows = CatalogKeyboard.build_activity_categories(
         activities,
-        selected_keys: ['honey'],
-      });
-
-      expect(rows[0][0].text).toStrictEqual('— Їжа —');
-      expect(rows[1][0].text).toStrictEqual('✅ мед');
-      expect(rows[1][0].callback_data).toStrictEqual(
-        'act:toggle:honey',
       );
-      expect(rows[rows.length - 1][0].text).toStrictEqual(
-        'Готово',
+
+      expect(rows[0][0]).toStrictEqual({
+        text: 'Їжа',
+        callback_data: 'nav:act:cat:food',
+      });
+      expect(rows[1][0]).toStrictEqual({
+        text: 'Довкілля',
+        callback_data: 'nav:act:cat:env',
+      });
+      expect(rows[rows.length - 1][0].callback_data).toStrictEqual(
+        'nav:menu',
       );
     });
   });
 
-  describe('build_symptoms', () => {
+  describe('build_activity_items', () => {
+    it('should mark selected items in a category', () => {
+      const rows = CatalogKeyboard.build_activity_items({
+        activities,
+        selected_keys: ['honey'],
+        category_key: 'food',
+      });
+
+      expect(rows[0][0].text).toStrictEqual('✅ мед');
+      expect(rows[0][0].callback_data).toStrictEqual(
+        'act:toggle:honey',
+      );
+      expect(rows[rows.length - 1].map((b) => b.text)).toStrictEqual(
+        ['⬅️ Назад', 'Готово'],
+      );
+    });
+  });
+
+  describe('build_symptom_items', () => {
     it('should build symptom toggle buttons', () => {
       const symptoms = [
         new Symptom({
@@ -66,12 +86,13 @@ describe('CatalogKeyboard', () => {
         }),
       ];
 
-      const rows = CatalogKeyboard.build_symptoms({
+      const rows = CatalogKeyboard.build_symptom_items({
         symptoms,
         selected_keys: [],
+        category_key: 'skin',
       });
 
-      expect(rows[1][0].callback_data).toStrictEqual(
+      expect(rows[0][0].callback_data).toStrictEqual(
         'sym:toggle:itch',
       );
     });

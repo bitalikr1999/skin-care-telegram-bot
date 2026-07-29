@@ -28,4 +28,12 @@ export class CallbackData {
   public static stats_period(period: string): string {
     return `stats:period:${period}`;
   }
+
+  public static act_category(category_key: string): string {
+    return `nav:act:cat:${category_key}`;
+  }
+
+  public static sym_category(category_key: string): string {
+    return `nav:sym:cat:${category_key}`;
+  }
 }

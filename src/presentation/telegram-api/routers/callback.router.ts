@@ -6,7 +6,9 @@ import {
 export type CallbackAction =
   | { kind: 'nav_menu' }
   | { kind: 'nav_activities' }
+  | { kind: 'nav_act_category'; category_key: string }
   | { kind: 'nav_symptoms' }
+  | { kind: 'nav_sym_category'; category_key: string }
   | { kind: 'nav_rating' }
   | { kind: 'nav_today' }
   | { kind: 'nav_stats_rating' }
@@ -51,6 +53,22 @@ export class CallbackRouter {
       data === 'done:rating'
     ) {
       return { kind: 'done_menu' };
+    }
+
+    if (data.startsWith('nav:act:cat:')) {
+      const category_key = data.slice('nav:act:cat:'.length);
+      if (!category_key) {
+        return { kind: 'unknown' };
+      }
+      return { kind: 'nav_act_category', category_key };
+    }
+
+    if (data.startsWith('nav:sym:cat:')) {
+      const category_key = data.slice('nav:sym:cat:'.length);
+      if (!category_key) {
+        return { kind: 'unknown' };
+      }
+      return { kind: 'nav_sym_category', category_key };
     }
 
     if (data.startsWith('stats:period:')) {

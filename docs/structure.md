@@ -110,10 +110,10 @@ One folder per entry channel:
 `telegram-api` implements `BOT_UPDATE_HANDLER`. Callback protocol:
 
 - `nav:menu|activities|symptoms|rating|today|stats|export`
+- `nav:act:cat:<category_key>` / `nav:sym:cat:<category_key>`
 - `act:toggle:<activity_key>` / `sym:toggle:<symptom_key>`
 - `rat:set:<1-10>`
 - `done:activities|symptoms|rating`
-- `noop:<category_key>` — category header (ignored)
 
 ## File naming
 
@@ -152,10 +152,11 @@ entities/rating/
 
 - Each catalog item has a stable `key` (snake_case) and a UI `label`
 - User records store **keys only** (`activity_key`, `symptom_key`)
-- Seed arrays live in `domain/seeds/`; infra inserts them into SQLite **once** when the table is empty
+- Seed arrays live in `domain/seeds/`; infra upserts them into SQLite by `key`
 - Runtime reads catalogs from DB via repository ports (`IActivitiesRepository`, `ISymptomsRepository`)
 - Catalogs are not editable via the bot UI
 - Seed is applied only through CLI (`pnpm seed`), never on bot module init
+- Bot catalog UI is a drill-down with one nesting level: category → toggle items
 
 ## Function parameters
 

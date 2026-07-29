@@ -20,6 +20,21 @@ describe('CallbackRouter', () => {
       });
     });
 
+    it('should parse catalog navigation callbacks', () => {
+      expect(
+        CallbackRouter.parse('nav:act:cat:food'),
+      ).toStrictEqual({
+        kind: 'nav_act_category',
+        category_key: 'food',
+      });
+      expect(
+        CallbackRouter.parse('nav:sym:cat:skin'),
+      ).toStrictEqual({
+        kind: 'nav_sym_category',
+        category_key: 'skin',
+      });
+    });
+
     it('should parse toggle and rating callbacks', () => {
       expect(
         CallbackRouter.parse('act:toggle:honey'),

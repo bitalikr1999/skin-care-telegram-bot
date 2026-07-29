@@ -30,4 +30,12 @@ describe('CallbackData', () => {
       );
     });
   });
+
+  describe('act_category', () => {
+    it('should build category callback', () => {
+      expect(CallbackData.act_category('food')).toStrictEqual(
+        'nav:act:cat:food',
+      );
+    });
+  });
 });

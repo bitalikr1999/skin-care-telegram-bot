@@ -43,6 +43,7 @@ import {
   IActivitiesRepository,
   ISymptomsRepository,
 } from '@domain/repositories';
+import { CatalogGroupUtils } from '@domain/utils/catalog-group.util';
 import { DateUtils } from '@domain/utils/date.util';
 import { RatingUtils } from '@domain/utils/rating.util';
 
@@ -107,9 +108,14 @@ export class BotUpdateHandler implements IBotUpdateHandler {
       case 'done_menu':
         return this._menu_view(params.message_id);
       case 'nav_activities':
-        return this._activities_view({
+        return this._activity_categories_view({
+          message_id: params.message_id,
+        });
+      case 'nav_act_category':
+        return this._activity_items_view({
           chat_id: params.chat_id,
           date,
+          category_key: action.category_key,
           message_id: params.message_id,
           markup_only: false,
         });
@@ -131,17 +137,35 @@ export class BotUpdateHandler implements IBotUpdateHandler {
             activity_key: action.activity_key,
           });
         }
-        return this._activities_view({
+
+        const activities =
+          await this.activities_repository.list_all();
+        const activity = activities.find(
+          (item) => item.key === action.activity_key,
+        );
+        if (!activity) {
+          return this._activity_categories_view({
+            message_id: params.message_id,
+          });
+        }
+
+        return this._activity_items_view({
           chat_id: params.chat_id,
           date,
+          category_key: activity.category_key,
           message_id: params.message_id,
           markup_only: true,
         });
       }
       case 'nav_symptoms':
-        return this._symptoms_view({
+        return this._symptom_categories_view({
+          message_id: params.message_id,
+        });
+      case 'nav_sym_category':
+        return this._symptom_items_view({
           chat_id: params.chat_id,
           date,
+          category_key: action.category_key,
           message_id: params.message_id,
           markup_only: false,
         });
@@ -163,9 +187,21 @@ export class BotUpdateHandler implements IBotUpdateHandler {
             symptom_key: action.symptom_key,
           });
         }
-        return this._symptoms_view({
+
+        const symptoms = await this.symptoms_repository.list_all();
+        const symptom = symptoms.find(
+          (item) => item.key === action.symptom_key,
+        );
+        if (!symptom) {
+          return this._symptom_categories_view({
+            message_id: params.message_id,
+          });
+        }
+
+        return this._symptom_items_view({
           chat_id: params.chat_id,
           date,
+          category_key: symptom.category_key,
           message_id: params.message_id,
           markup_only: true,
         });
@@ -224,9 +260,23 @@ export class BotUpdateHandler implements IBotUpdateHandler {
     };
   }
 
-  private async _activities_view(params: {
+  private async _activity_categories_view(params: {
+    message_id: number;
+  }): Promise<IBotView> {
+    const activities = await this.activities_repository.list_all();
+
+    return {
+      text: '➕ Обери категорію активностей',
+      buttons:
+        CatalogKeyboard.build_activity_categories(activities),
+      edit_message_id: params.message_id,
+    };
+  }
+
+  private async _activity_items_view(params: {
     chat_id: number;
     date: string;
+    category_key: string;
     message_id: number;
     markup_only: boolean;
   }): Promise<IBotView> {
@@ -238,20 +288,44 @@ export class BotUpdateHandler implements IBotUpdateHandler {
       }),
     ]);
 
+    const category_label = CatalogGroupUtils.find_category_label({
+      items: activities,
+      category_key: params.category_key,
+    });
+    if (!category_label) {
+      return this._activity_categories_view({
+        message_id: params.message_id,
+      });
+    }
+
     return {
-      text: '➕ Обери активності за сьогодні',
-      buttons: CatalogKeyboard.build_activities({
+      text: `➕ ${category_label}`,
+      buttons: CatalogKeyboard.build_activity_items({
         activities,
         selected_keys,
+        category_key: params.category_key,
       }),
       edit_message_id: params.message_id,
       edit_reply_markup_only: params.markup_only,
     };
   }
 
-  private async _symptoms_view(params: {
+  private async _symptom_categories_view(params: {
+    message_id: number;
+  }): Promise<IBotView> {
+    const symptoms = await this.symptoms_repository.list_all();
+
+    return {
+      text: '🩺 Обери категорію симптомів',
+      buttons: CatalogKeyboard.build_symptom_categories(symptoms),
+      edit_message_id: params.message_id,
+    };
+  }
+
+  private async _symptom_items_view(params: {
     chat_id: number;
     date: string;
+    category_key: string;
     message_id: number;
     markup_only: boolean;
   }): Promise<IBotView> {
@@ -263,11 +337,22 @@ export class BotUpdateHandler implements IBotUpdateHandler {
       }),
     ]);
 
+    const category_label = CatalogGroupUtils.find_category_label({
+      items: symptoms,
+      category_key: params.category_key,
+    });
+    if (!category_label) {
+      return this._symptom_categories_view({
+        message_id: params.message_id,
+      });
+    }
+
     return {
-      text: '🩺 Обери симптоми за сьогодні',
-      buttons: CatalogKeyboard.build_symptoms({
+      text: `🩺 ${category_label}`,
+      buttons: CatalogKeyboard.build_symptom_items({
         symptoms,
         selected_keys,
+        category_key: params.category_key,
       }),
       edit_message_id: params.message_id,
       edit_reply_markup_only: params.markup_only,

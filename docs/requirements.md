@@ -27,35 +27,50 @@
 
 | category_key | category_label | key | label |
 |---|---|---|---|
-| food | Їжа | honey | мед |
 | food | Їжа | dairy | молочні продукти |
-| food | Їжа | gluten | глютен (хліб/випічка) |
-| food | Їжа | citrus | цитрусові |
-| food | Їжа | chocolate | шоколад |
-| food | Їжа | nuts | горіхи |
+| food | Їжа | cheese | сир |
+| food | Їжа | yogurt | йогурт |
+| food | Їжа | butter | вершкове масло |
 | food | Їжа | eggs | яйця |
+| food | Їжа | nuts | горіхи |
 | food | Їжа | seafood | морепродукти |
+| food | Їжа | honey | мед |
+| food | Їжа | soy | соя |
+| food | Їжа | red_meat | червоне мʼясо |
+| food | Їжа | gluten | глютен (хліб/випічка) |
+| food | Їжа | chocolate | шоколад |
+| food | Їжа | sugar | багато цукру |
+| food | Їжа | sweets | солодощі |
+| food | Їжа | fried | смажене |
+| food | Їжа | citrus | цитрусові |
+| food | Їжа | tomato | томати |
+| food | Їжа | strawberry | полуниця |
 | food | Їжа | spicy | гострі страви |
-| food | Їжа | alcohol | алкоголь |
-| food | Їжа | coffee | кава |
+| drinks | Напої | beer | пиво |
+| drinks | Напої | wine | вино |
+| drinks | Напої | spirits | міцні напої |
+| drinks | Напої | coffee | кава |
+| drinks | Напої | tea | чай |
+| drinks | Напої | soda | газовані напої |
+| drinks | Напої | energy_drink | енергетики |
 | activity_environment | Активність та довкілля | sea_swim | купання в морі |
 | activity_environment | Активність та довкілля | pool | басейн |
-| activity_environment | Активність та довкілля | sport | біг/спорт |
 | activity_environment | Активність та довкілля | sauna | сауна/лазня |
 | activity_environment | Активність та довкілля | sun | довге перебування на сонці |
+| activity_environment | Активність та довкілля | heat | спека/духота |
+| activity_environment | Активність та довкілля | sport | біг/спорт |
 | activity_environment | Активність та довкілля | stress | сильний стрес |
 | activity_environment | Активність та довкілля | poor_sleep | поганий сон |
-| activity_environment | Активність та довкілля | heat | спека/духота |
 | household_care | Побут і догляд | new_cosmetics | новий крем/косметика |
+| household_care | Побут і догляд | new_perfume | новий парфум |
 | household_care | Побут і догляд | new_detergent | новий пральний порошок |
 | household_care | Побут і догляд | synthetic_clothes | синтетичний одяг |
 | household_care | Побут і догляд | animal_contact | контакт з твариною |
-| household_care | Побут і догляд | new_perfume | новий парфум |
 | household_care | Побут і догляд | chemical_cleaning | прибирання з хімією |
 | meds_supplements | Ліки та добавки | antihistamine | антигістамінне |
 | meds_supplements | Ліки та добавки | steroid_cream | кортикостероїдний крем |
-| meds_supplements | Ліки та добавки | vitamins | вітаміни/добавки |
 | meds_supplements | Ліки та добавки | new_meds | нові ліки |
+| meds_supplements | Ліки та добавки | vitamins | вітаміни/добавки |
 
 ### 4.2 Симптоми (`symptoms`), згруповані за категоріями:
 
@@ -98,7 +113,7 @@
 ## 7. Сценарії
 
 ### 7.1 Додати активності
-Відкриває inline-клавіатуру з усіма активностями, згрупованими за категоріями (заголовок категорії — некликабельний роздільник). Уже вибрані сьогодні пункти позначені ✅. Клік по пункту — toggle (додати/прибрати), клавіатура одразу оновлюється (`editMessageReplyMarkup`, без пересилання нового повідомлення). Можна вибрати від 0 до необмеженої кількості пунктів. Кнопка "Готово" повертає в головне меню.
+Відкриває drill-down з одним рівнем вкладеності: **категорія → пункти**. Уже вибрані сьогодні пункти позначені ✅. Клік по пункту — toggle (додати/прибрати), клавіатура одразу оновлюється (`editMessageReplyMarkup`, без пересилання нового повідомлення). Можна вибрати від 0 до необмеженої кількості пунктів. "⬅️ Назад" повертає до списку категорій, "Готово" — у головне меню.
 
 ### 7.2 Додати самопочуття
 Те саме, що 7.1, але для довідника симптомів. Повністю незалежний сценарій від активностей — не пов'язаний з ним послідовністю кроків.
@@ -145,7 +160,7 @@ symptom_records(chat_id, date, symptom_key)
   FOREIGN KEY(symptom_key) REFERENCES symptoms(key)
 ```
 
-Seed: **лише через CLI** (`MOD=cli` → команда `seed`). Schema + catalogs; якщо таблиці вже не порожні — seed не перезаписує. При старті бота seed **не** запускається.
+Seed: **лише через CLI** (`MOD=cli` → команда `seed`). Schema + catalogs; seed **upsert** за `key` (оновлює labels/категорії, додає нові ключі; невикористані ключі з каталогу прибирає). При старті бота seed **не** запускається.
 
 Шлях до файлу БД: env `SQLITE_PATH` (default `./data/skin-diary.sqlite`). Адаптер: `infra/db-light` (SQLite via knex + better-sqlite3); паралельна реалізація під інший рушій — окремий модуль (напр. `db-pg`).
 
