@@ -2,7 +2,10 @@ import { RatingValue, RATING_VALUES } from '@domain/consts/rating.const';
 import { Activity } from '@domain/entities/activity/activity.entity';
 import { Symptom } from '@domain/entities/symptom/symptom.entity';
 import { IBotButton } from '@domain/interfaces/bot-ui.interface';
-import { CatalogGroupUtils } from '@domain/utils/catalog-group.util';
+import {
+  CatalogGroupUtils,
+  ICatalogGroupItem,
+} from '@domain/utils/catalog-group.util';
 
 import {
   CALLBACK,
@@ -104,10 +107,7 @@ export class CatalogKeyboard {
   }
 
   private static _build_categories(params: {
-    items: Array<{
-      category_key: string;
-      category_label: string;
-    }>;
+    items: ICatalogGroupItem[];
     open_category: (category_key: string) => string;
     back_callback: string;
   }): IBotButton[][] {
@@ -127,11 +127,7 @@ export class CatalogKeyboard {
   }
 
   private static _build_items(params: {
-    items: Array<{
-      key: string;
-      label: string;
-      category_key: string;
-    }>;
+    items: ICatalogGroupItem[];
     selected_keys: string[];
     category_key: string;
     toggle: (key: string) => string;
